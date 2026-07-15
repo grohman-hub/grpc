@@ -31,14 +31,18 @@ class ClientLoggingInterceptor(
     async def intercept_unary_unary(
         self, continuation, client_call_details, request
     ):
-        print(f"[ClientLoggingInterceptor] Intercepting UnaryUnary RPC: {client_call_details.method}")
+        print(
+            f"[ClientLoggingInterceptor] Intercepting UnaryUnary RPC: {client_call_details.method}"
+        )
         call = await continuation(client_call_details, request)
         return call
 
     async def intercept_unary_stream(
         self, continuation, client_call_details, request
     ):
-        print(f"[ClientLoggingInterceptor] Intercepting UnaryStream RPC: {client_call_details.method}")
+        print(
+            f"[ClientLoggingInterceptor] Intercepting UnaryStream RPC: {client_call_details.method}"
+        )
         call = await continuation(client_call_details, request)
         return call
 
@@ -48,7 +52,7 @@ class PassThroughClientInterceptor(
     grpc.aio.UnaryStreamClientInterceptor,
 ):
     """An interceptor that passes through continuation directly without explicit await.
-    
+
     grpc.aio automatically unwraps returned coroutines across all RPC arities,
     so callers still only need standard single await or standard async iteration.
     """
@@ -56,13 +60,17 @@ class PassThroughClientInterceptor(
     async def intercept_unary_unary(
         self, continuation, client_call_details, request
     ):
-        print("[PassThroughClientInterceptor] Passing UnaryUnary continuation through directly.")
+        print(
+            "[PassThroughClientInterceptor] Passing UnaryUnary continuation through directly."
+        )
         return continuation(client_call_details, request)
 
     async def intercept_unary_stream(
         self, continuation, client_call_details, request
     ):
-        print("[PassThroughClientInterceptor] Passing UnaryStream continuation through directly.")
+        print(
+            "[PassThroughClientInterceptor] Passing UnaryStream continuation through directly."
+        )
         return continuation(client_call_details, request)
 
 

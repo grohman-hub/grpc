@@ -799,7 +799,9 @@ class InterceptedUnaryStreamCall(
                     continuation, client_call_details, request
                 )
 
-                if inspect.isawaitable(call_or_response_iterator) and not isinstance(
+                if inspect.isawaitable(
+                    call_or_response_iterator
+                ) and not isinstance(
                     call_or_response_iterator, _base_call.UnaryStreamCall
                 ):
                     call_or_response_iterator = await call_or_response_iterator
@@ -1031,7 +1033,9 @@ class InterceptedStreamStreamCall(
                     continuation, client_call_details, request_iterator
                 )
 
-                if inspect.isawaitable(call_or_response_iterator) and not isinstance(
+                if inspect.isawaitable(
+                    call_or_response_iterator
+                ) and not isinstance(
                     call_or_response_iterator, _base_call.StreamStreamCall
                 ):
                     call_or_response_iterator = await call_or_response_iterator
