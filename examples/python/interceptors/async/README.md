@@ -30,8 +30,8 @@ This example have the following steps:
 * On client side (using client interceptors):
 
 ```
-[ClientInterceptor] Intercepting RPC method: /helloworld.Greeter/SayHello
-[PassThroughInterceptor] Passing continuation through directly.
+[ClientLoggingInterceptor] Intercepting UnaryUnary RPC: /helloworld.Greeter/SayHello
+[PassThroughClientInterceptor] Passing UnaryUnary continuation through directly.
 Sending request with rpc id: 59ac966558b3d7d11a06bd45f1a0f89d
 Greeter client received: Hello, you!
 ```

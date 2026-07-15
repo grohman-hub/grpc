@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Example of AsyncIO Client Interceptor usage in gRPC Python."""
+"""Example of AsyncIO Client Interceptor usage in gRPC Python across different RPC arities."""
 
 import asyncio
 import logging
@@ -22,29 +22,47 @@ import helloworld_pb2
 import helloworld_pb2_grpc
 
 
-class ClientLoggingInterceptor(grpc.aio.UnaryUnaryClientInterceptor):
-    """An interceptor that logs RPC requests and supports async continuation handling."""
+class ClientLoggingInterceptor(
+    grpc.aio.UnaryUnaryClientInterceptor,
+    grpc.aio.UnaryStreamClientInterceptor,
+):
+    """An interceptor that logs RPC requests across different call arities."""
 
     async def intercept_unary_unary(
         self, continuation, client_call_details, request
     ):
-        print(f"[ClientInterceptor] Intercepting RPC method: {client_call_details.method}")
+        print(f"[ClientLoggingInterceptor] Intercepting UnaryUnary RPC: {client_call_details.method}")
+        call = await continuation(client_call_details, request)
+        return call
 
-        # In grpc.aio, continuation can be awaited directly:
+    async def intercept_unary_stream(
+        self, continuation, client_call_details, request
+    ):
+        print(f"[ClientLoggingInterceptor] Intercepting UnaryStream RPC: {client_call_details.method}")
         call = await continuation(client_call_details, request)
         return call
 
 
-class PassThroughClientInterceptor(grpc.aio.UnaryUnaryClientInterceptor):
+class PassThroughClientInterceptor(
+    grpc.aio.UnaryUnaryClientInterceptor,
+    grpc.aio.UnaryStreamClientInterceptor,
+):
     """An interceptor that passes through continuation directly without explicit await.
     
-    grpc.aio automatically unwraps returned coroutines so callers still only need a single await.
+    grpc.aio automatically unwraps returned coroutines across all RPC arities,
+    so callers still only need standard single await or standard async iteration.
     """
 
     async def intercept_unary_unary(
         self, continuation, client_call_details, request
     ):
-        print("[PassThroughInterceptor] Passing continuation through directly.")
+        print("[PassThroughClientInterceptor] Passing UnaryUnary continuation through directly.")
+        return continuation(client_call_details, request)
+
+    async def intercept_unary_stream(
+        self, continuation, client_call_details, request
+    ):
+        print("[PassThroughClientInterceptor] Passing UnaryStream continuation through directly.")
         return continuation(client_call_details, request)
 
 
@@ -64,7 +82,7 @@ async def run() -> None:
         )
         print(f"Sending request with rpc id: {rpc_id}")
 
-        # Single await standard invocation
+        # Standard single await invocation
         response = await stub.SayHello(
             helloworld_pb2.HelloRequest(name="you"), metadata=metadata
         )
