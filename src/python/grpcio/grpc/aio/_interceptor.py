@@ -19,6 +19,7 @@ from abc import abstractmethod
 import asyncio
 import collections
 import functools
+import inspect
 from typing import (
     AsyncIterable,
     AsyncIterator,
@@ -691,6 +692,11 @@ class InterceptedUnaryUnaryCall(
                     continuation, client_call_details, request
                 )
 
+                if inspect.isawaitable(call_or_response) and not isinstance(
+                    call_or_response, _base_call.UnaryUnaryCall
+                ):
+                    call_or_response = await call_or_response
+
                 if isinstance(call_or_response, _base_call.UnaryUnaryCall):
                     return call_or_response
                 return UnaryUnaryCallResponse(call_or_response)
@@ -1091,6 +1097,9 @@ class UnaryUnaryCallResponse(_base_call.UnaryUnaryCall):
         return None
 
     def __await__(self):
+        if inspect.isawaitable(self._response):
+            response = yield from self._response.__await__()
+            return response
         if False:  # pylint: disable=using-constant-test
             # This code path is never used, but a yield statement is needed
             # for telling the interpreter that __await__ is a generator.

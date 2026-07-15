@@ -83,6 +83,26 @@ class TestUnaryUnaryClientInterceptor(AioTestBase):
 
             self.assertIsInstance(response, messages_pb2.SimpleResponse)
 
+    async def test_unawaited_continuation_interceptor(self):
+        class UnawaitedContinuationInterceptor(aio.UnaryUnaryClientInterceptor):
+            async def intercept_unary_unary(
+                self, continuation, client_call_details, request
+            ):
+                return continuation(client_call_details, request)
+
+        async with aio.insecure_channel(
+            self._server_target, interceptors=[UnawaitedContinuationInterceptor()]
+        ) as channel:
+            multicallable = channel.unary_unary(
+                "/grpc.testing.TestService/UnaryCall",
+                request_serializer=messages_pb2.SimpleRequest.SerializeToString,
+                response_deserializer=messages_pb2.SimpleResponse.FromString,
+            )
+            call = multicallable(messages_pb2.SimpleRequest())
+            response = await call
+            self.assertIsInstance(response, messages_pb2.SimpleResponse)
+
+
     @unittest.expectedFailure
     # TODO(https://github.com/grpc/grpc/issues/20144) Once metadata support is
     # implemented in the client-side, this test must be implemented.
