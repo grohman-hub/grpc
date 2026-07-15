@@ -28,7 +28,9 @@ class ClientLoggingInterceptor(grpc.aio.UnaryUnaryClientInterceptor):
     async def intercept_unary_unary(
         self, continuation, client_call_details, request
     ):
-        print(f"[ClientInterceptor] Intercepting RPC method: {client_call_details.method}")
+        print(
+            f"[ClientInterceptor] Intercepting RPC method: {client_call_details.method}"
+        )
 
         # In grpc.aio, continuation can be awaited directly:
         call = await continuation(client_call_details, request)
@@ -37,7 +39,7 @@ class ClientLoggingInterceptor(grpc.aio.UnaryUnaryClientInterceptor):
 
 class PassThroughClientInterceptor(grpc.aio.UnaryUnaryClientInterceptor):
     """An interceptor that passes through continuation directly without explicit await.
-    
+
     grpc.aio automatically unwraps returned coroutines so callers still only need a single await.
     """
 
