@@ -91,7 +91,8 @@ class TestUnaryUnaryClientInterceptor(AioTestBase):
                 return continuation(client_call_details, request)
 
         async with aio.insecure_channel(
-            self._server_target, interceptors=[UnawaitedContinuationInterceptor()]
+            self._server_target,
+            interceptors=[UnawaitedContinuationInterceptor()],
         ) as channel:
             multicallable = channel.unary_unary(
                 "/grpc.testing.TestService/UnaryCall",
@@ -101,7 +102,6 @@ class TestUnaryUnaryClientInterceptor(AioTestBase):
             call = multicallable(messages_pb2.SimpleRequest())
             response = await call
             self.assertIsInstance(response, messages_pb2.SimpleResponse)
-
 
     @unittest.expectedFailure
     # TODO(https://github.com/grpc/grpc/issues/20144) Once metadata support is
