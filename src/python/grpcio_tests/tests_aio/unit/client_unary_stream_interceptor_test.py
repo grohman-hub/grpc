@@ -120,7 +120,9 @@ class TestUnaryStreamClientInterceptor(AioTestBase):
                 await channel.close()
 
     async def test_unawaited_continuation_unary_stream_interceptor(self):
-        class UnawaitedContinuationInterceptor(aio.UnaryStreamClientInterceptor):
+        class UnawaitedContinuationInterceptor(
+            aio.UnaryStreamClientInterceptor
+        ):
             async def intercept_unary_stream(
                 self, continuation, client_call_details, request
             ):
