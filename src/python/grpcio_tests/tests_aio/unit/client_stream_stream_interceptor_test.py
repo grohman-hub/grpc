@@ -117,7 +117,9 @@ class TestStreamStreamClientInterceptor(AioTestBase):
                 await channel.close()
 
     async def test_unawaited_continuation_stream_stream_interceptor(self):
-        class UnawaitedContinuationInterceptor(aio.StreamStreamClientInterceptor):
+        class UnawaitedContinuationInterceptor(
+            aio.StreamStreamClientInterceptor
+        ):
             async def intercept_stream_stream(
                 self, continuation, client_call_details, request_iterator
             ):

@@ -1,4 +1,4 @@
-# Copyright 2020 The gRPC Authors.
+s# Copyright 2020 The gRPC Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -120,7 +120,9 @@ class TestUnaryStreamClientInterceptor(AioTestBase):
                 await channel.close()
 
     async def test_unawaited_continuation_unary_stream_interceptor(self):
-        class UnawaitedContinuationInterceptor(aio.UnaryStreamClientInterceptor):
+        class UnawaitedContinuationInterceptor(
+            aio.UnaryStreamClientInterceptor
+        ):
             async def intercept_unary_stream(
                 self, continuation, client_call_details, request
             ):
