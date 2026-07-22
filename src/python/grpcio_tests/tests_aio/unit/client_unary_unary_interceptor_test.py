@@ -83,7 +83,7 @@ class TestUnaryUnaryClientInterceptor(AioTestBase):
 
             self.assertIsInstance(response, messages_pb2.SimpleResponse)
 
-    async def test_unawaited_continuation_interceptor(self):
+    async def test_unawaited_continuation_unary_unary_interceptor(self):
         class UnawaitedContinuationInterceptor(aio.UnaryUnaryClientInterceptor):
             async def intercept_unary_unary(
                 self, continuation, client_call_details, request

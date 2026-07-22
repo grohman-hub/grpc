@@ -116,6 +116,36 @@ class TestStreamStreamClientInterceptor(AioTestBase):
 
                 await channel.close()
 
+    async def test_unawaited_continuation_stream_stream_interceptor(self):
+        class UnawaitedContinuationInterceptor(aio.StreamStreamClientInterceptor):
+            async def intercept_stream_stream(
+                self, continuation, client_call_details, request_iterator
+            ):
+                return continuation(client_call_details, request_iterator)
+
+        request = messages_pb2.StreamingOutputCallRequest()
+        request.response_parameters.append(
+            messages_pb2.ResponseParameters(size=_RESPONSE_PAYLOAD_SIZE)
+        )
+
+        async def request_iterator():
+            for _ in range(_NUM_STREAM_REQUESTS):
+                yield request
+
+        async with aio.insecure_channel(
+            self._server_target,
+            interceptors=[UnawaitedContinuationInterceptor()],
+        ) as channel:
+            stub = test_pb2_grpc.TestServiceStub(channel)
+            call = stub.FullDuplexCall(request_iterator())
+            response_cnt = 0
+            async for response in call:
+                response_cnt += 1
+                self.assertIsInstance(
+                    response, messages_pb2.StreamingOutputCallResponse
+                )
+            self.assertEqual(response_cnt, _NUM_STREAM_RESPONSES)
+
     async def test_intercepts_using_write_and_read(self):
         for interceptor_class in (
             _StreamStreamInterceptorEmpty,

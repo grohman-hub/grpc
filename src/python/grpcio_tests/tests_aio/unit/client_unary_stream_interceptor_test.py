@@ -119,6 +119,33 @@ class TestUnaryStreamClientInterceptor(AioTestBase):
 
                 await channel.close()
 
+    async def test_unawaited_continuation_unary_stream_interceptor(self):
+        class UnawaitedContinuationInterceptor(aio.UnaryStreamClientInterceptor):
+            async def intercept_unary_stream(
+                self, continuation, client_call_details, request
+            ):
+                return continuation(client_call_details, request)
+
+        request = messages_pb2.StreamingOutputCallRequest()
+        request.response_parameters.extend(
+            [messages_pb2.ResponseParameters(size=_RESPONSE_PAYLOAD_SIZE)]
+            * _NUM_STREAM_RESPONSES
+        )
+
+        async with aio.insecure_channel(
+            self._server_target,
+            interceptors=[UnawaitedContinuationInterceptor()],
+        ) as channel:
+            stub = test_pb2_grpc.TestServiceStub(channel)
+            call = stub.StreamingOutputCall(request)
+            response_cnt = 0
+            async for response in call:
+                response_cnt += 1
+                self.assertIsInstance(
+                    response, messages_pb2.StreamingOutputCallResponse
+                )
+            self.assertEqual(response_cnt, _NUM_STREAM_RESPONSES)
+
     async def test_add_done_callback_interceptor_task_not_finished(self):
         for interceptor_class in (
             _UnaryStreamInterceptorEmpty,

@@ -1118,8 +1118,6 @@ class UnaryUnaryCallResponse(_base_call.UnaryUnaryCall):
         return None
 
     def __await__(self):
-        if inspect.isawaitable(self._response):
-            self._response = yield from self._response.__await__()
         if False:  # pylint: disable=using-constant-test
             # This code path is never used, but a yield statement is needed
             # for telling the interpreter that __await__ is a generator.
