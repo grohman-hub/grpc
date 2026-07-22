@@ -22,18 +22,21 @@ This example have the following steps:
 ## How to run this example
 
 1. Start server: `python3 -m async_greeter_server_with_interceptor`
-2. Start client: `python3 -m async_greeter_client`
+2. Start standard client: `python3 -m async_greeter_client`
+3. Or start client with client interceptors: `python3 -m async_greeter_client_with_interceptor`
 
 ### Expected outcome
 
-* On client side, you should see logs similar to:
+* On client side (using client interceptors):
 
 ```
+[ClientLoggingInterceptor] Intercepting UnaryUnary RPC: /helloworld.Greeter/SayHello
+[PassThroughClientInterceptor] Passing UnaryUnary continuation through directly.
 Sending request with rpc id: 59ac966558b3d7d11a06bd45f1a0f89d
 Greeter client received: Hello, you!
 ```
 
-* On server side, you should see logs similar to:
+* On server side:
 
 ```
 INFO:root:Starting server on [::]:50051
@@ -41,3 +44,4 @@ INFO:root:Interceptor1 called with rpc_id: default
 INFO:root:Interceptor2 called with rpc_id: Interceptor1-59ac966558b3d7d11a06bd45f1a0f89d
 INFO:root:Handle rpc with id Interceptor2-Interceptor1-59ac966558b3d7d11a06bd45f1a0f89d in server handler.
 ```
+
